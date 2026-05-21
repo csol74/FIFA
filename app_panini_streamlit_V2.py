@@ -162,26 +162,33 @@ def componer_sticker(
 
     def texto_centrado_autofit(draw, texto, y1, y2, size_max,
                                color=(255,255,255), sombra=(0,0,0)):
-        """Centra el texto en la barra y reduce fuente si no cabe en el ancho."""
-        margen_x = 55
+        """Llena la barra con el texto lo más grande posible (ancho Y alto)."""
+        margen_x  = 55
+        margen_v  = 10
         ancho_max = sw - margen_x * 2
+        alto_max  = (y2 - y1) - margen_v * 2   # alto disponible en la barra
         size = size_max
         fn = fuente(size)
         while size > 18:
             fn = fuente(size)
             bb = draw.textbbox((0, 0), texto, font=fn)
-            if (bb[2] - bb[0]) <= ancho_max:
+            ancho_txt = bb[2] - bb[0]
+            alto_txt  = bb[3] - bb[1]
+            if ancho_txt <= ancho_max and alto_txt <= alto_max:
                 break
-            size -= 150
+            size -= 4
         bb  = draw.textbbox((0, 0), texto, font=fn)
         th  = bb[3] - bb[1]
         tw  = bb[2] - bb[0]
         tx  = (sw - tw) // 2
         cy  = (y1 + y2) // 2
         ty  = cy - th // 2
-        # Sombra negra gruesa en 6 direcciones para máximo contraste
-        for dx, dy in [(-2,-2),(2,-2),(-2,2),(2,2),(0,3),(3,0),(-3,0),(0,-3)]:
-            draw.text((tx+dx, ty+dy), texto, font=fn, fill=sombra)
+        # Sombra negra gruesa en 8 direcciones para máximo contraste
+        grosor = max(2, size // 30)
+        for dx in range(-grosor, grosor+1):
+            for dy in range(-grosor, grosor+1):
+                if dx != 0 or dy != 0:
+                    draw.text((tx+dx, ty+dy), texto, font=fn, fill=sombra)
         draw.text((tx, ty), texto, font=fn, fill=color)
 
     draw = ImageDraw.Draw(card)
@@ -189,7 +196,7 @@ def componer_sticker(
     # ── 4. BARRA 1 → NOMBRE grande en blanco ─────────────────────────────────
     texto_centrado_autofit(draw, nombre.upper(),
                            BARRA1_Y1, BARRA1_Y2,
-                           size_max=110,
+                           size_max=500,
                            color=(255, 255, 255), sombra=(0, 0, 0))
 
     # ── 5. BARRA 2 → datos en una línea, blanco, fuente grande autofit ───────
@@ -197,7 +204,7 @@ def componer_sticker(
                    f"{club.upper()}  ·  {pais.upper()}")
     texto_centrado_autofit(draw, datos_linea,
                            BARRA2_Y1, BARRA2_Y2,
-                           size_max=60,
+                           size_max=300,
                            color=(255, 255, 255), sombra=(0, 0, 0))
 
     return card
