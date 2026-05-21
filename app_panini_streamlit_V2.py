@@ -160,9 +160,9 @@ def componer_sticker(
         except Exception:
             return ImageFont.load_default()
 
-    fn_nombre = fuente(80, bold=True)
-    fn_dato   = fuente(50, bold=True)
-    fn_label  = fuente(28, bold=False)
+    fn_nombre = fuente(200, bold=True)
+    fn_dato   = fuente(150, bold=True)
+    fn_label  = fuente(10, bold=False)
 
     draw = ImageDraw.Draw(card)
 
