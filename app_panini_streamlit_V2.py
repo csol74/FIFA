@@ -7,7 +7,6 @@ Dependencias (requirements.txt):
     tensorflow
     pillow
     numpy
-    gdown
 """
 
 import streamlit as st
@@ -16,7 +15,6 @@ import tensorflow as tf
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 import io
 import os
-import gdown
 
 # ─── Configuración de página ─────────────────────────────────────────────────
 st.set_page_config(
@@ -26,13 +24,11 @@ st.set_page_config(
 )
 
 # ─── Constantes ──────────────────────────────────────────────────────────────
-Z_DIM      = 100
-MODEL_PATH = "generador_fifa_ccd.keras"
-STICKER_PATH = "sticker.jpg"          # sticker Panini de fondo (subir al repo)
-
-# URL pública del modelo en Google Drive.
-# ⚠️  AJUSTA con el enlace real de tu modelo subido a Drive.
-MODEL_URL = "https://drive.google.com/uc?id=REEMPLAZA_CON_TU_FILE_ID"
+# Ambos archivos están en la raíz del repositorio de GitHub.
+# Streamlit Cloud clona el repo completo, así que los encuentra directamente.
+Z_DIM        = 100
+MODEL_PATH   = "generador_fifa_ccd.keras"
+STICKER_PATH = "sticker.jpg"
 
 # ─── Coordenadas calibradas del sticker (1197 × 1600 px) ─────────────────────
 # Zona morada = donde va la foto del jugador
@@ -50,18 +46,13 @@ BARRA_X2  = 940     # fin horizontal barra
 # ─── Carga del modelo con caché ──────────────────────────────────────────────
 @st.cache_resource(show_spinner="Cargando generador DCGAN…")
 def cargar_modelo():
-    if not os.path.exists(MODEL_PATH):
-        st.info("📥 Descargando modelo desde la nube… (solo la primera vez)")
-        gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
     modelo = tf.keras.models.load_model(MODEL_PATH, compile=False)
     return modelo
 
 # ─── Carga del sticker de fondo ──────────────────────────────────────────────
 @st.cache_resource(show_spinner="Cargando sticker…")
 def cargar_sticker():
-    if os.path.exists(STICKER_PATH):
-        return Image.open(STICKER_PATH).convert("RGB")
-    return None
+    return Image.open(STICKER_PATH).convert("RGB")
 
 # ─── Generación de imagen por semilla ────────────────────────────────────────
 def generar_imagen_gan(modelo, semilla: int) -> Image.Image:
