@@ -172,7 +172,7 @@ def componer_sticker(
             bb = draw.textbbox((0, 0), texto, font=fn)
             if (bb[2] - bb[0]) <= ancho_max:
                 break
-            size -= 20
+            size -= 150
         bb  = draw.textbbox((0, 0), texto, font=fn)
         th  = bb[3] - bb[1]
         tw  = bb[2] - bb[0]
